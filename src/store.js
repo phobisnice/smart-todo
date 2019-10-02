@@ -21,6 +21,17 @@ export default new Vuex.Store({
       state.tasks = state.tasks.filter(task => task.id !== taskId);
       localStorage.setItem('tasks', JSON.stringify(state.tasks));
     },
+    UPDATE_TASK(state, edited) {
+      state.tasks = state.tasks.map((task) => {
+        if (task.id === edited.id) {
+          const taskWithNewStatus = Object.assign(task, { status: edited.status });
+          return taskWithNewStatus;
+        }
+        return task;
+      });
+
+      localStorage.setItem('tasks', JSON.stringify(state.tasks));
+    },
     INIT_APP(state, tasks) {
       state.tasks = [...tasks];
     },
@@ -34,6 +45,9 @@ export default new Vuex.Store({
     },
     removeTask({ commit }, taskId) {
       commit('REMOVE_TASK', taskId);
+    },
+    updateTask({ commit }, edited) {
+      commit('UPDATE_TASK', edited);
     },
     init({ commit }) {
       const tasks = JSON.parse(localStorage.getItem('tasks')) || [];

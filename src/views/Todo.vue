@@ -66,8 +66,6 @@ export default {
         time: this.currentTask.time,
         id: this.$route.params.id
       };
-
-      console.log(editedTask);
       this.changeTask(editedTask);
       this.edit = false;
       this.status = "";

@@ -8,7 +8,6 @@
             class="btn-bordered types__btn"
             type="button"
             @click.prevent="addNewTask('open')"
-            data-status="open"
           >New Task</button>
         </header>
         <div class="types__content">
@@ -16,12 +15,28 @@
             <transition name="fade">
               <add-todo v-show="formtType.open" :status="'open'" @statusChange="statusChange" />
             </transition>
-            <todo-item v-for="item in openTasks" :key="item.id" :todo="item" />
             <transition name="fade-out">
               <li v-show="!openTasks.length && !formtType.open" class="todo-list__item">
                 <span class="todo-list__empty">No tasks yet</span>
               </li>
             </transition>
+            <li class="todo-list__dragzone">
+              <draggable
+                :oepnTasks="openTasks"
+                group="tasks"
+                tag="ul"
+                class="todo-list__inner"
+                data-status="open"
+                @end="editStatus"
+              >
+                <todo-item
+                  v-for="item in openTasks"
+                  :key="item.id"
+                  :todo="item"
+                  :data-id="item.id"
+                />
+              </draggable>
+            </li>
           </ul>
         </div>
       </article>
@@ -33,7 +48,6 @@
             class="btn-bordered types__btn"
             type="button"
             @click.prevent="addNewTask('progress')"
-            data-status="open"
           >New Task</button>
         </header>
         <div class="types__content">
@@ -45,12 +59,28 @@
                 @statusChange="statusChange"
               />
             </transition>
-            <todo-item v-for="item in progressTasks" :key="item.id" :todo="item" />
             <transition name="fade-out">
               <li v-show="!progressTasks.length && !formtType.progress" class="todo-list__item">
                 <span class="todo-list__empty">No tasks in work</span>
               </li>
             </transition>
+            <li class="todo-list__dragzone">
+              <draggable
+                :progressTasks="progressTasks"
+                group="tasks"
+                tag="ul"
+                class="todo-list__inner"
+                data-status="progress"
+                @end="editStatus"
+              >
+                <todo-item
+                  v-for="item in progressTasks"
+                  :key="item.id"
+                  :todo="item"
+                  :data-id="item.id"
+                />
+              </draggable>
+            </li>
           </ul>
         </div>
       </article>
@@ -62,7 +92,6 @@
             class="btn-bordered types__btn"
             type="button"
             @click.prevent="addNewTask('complete')"
-            data-status="open"
           >New Task</button>
         </header>
         <div class="types__content">
@@ -74,12 +103,28 @@
                 @statusChange="statusChange"
               />
             </transition>
-            <todo-item v-for="item in completeTasks" :key="item.id" :todo="item" />
             <transition name="fade-out">
               <li v-show="!completeTasks.length && !formtType.complete" class="todo-list__item">
                 <span class="todo-list__empty">No tasks in done</span>
               </li>
             </transition>
+            <li class="todo-list__dragzone">
+              <draggable
+                :progressTasks="completeTasks"
+                group="tasks"
+                tag="ul"
+                class="todo-list__inner"
+                data-status="complete"
+                @end="editStatus"
+              >
+                <todo-item
+                  v-for="item in completeTasks"
+                  :key="item.id"
+                  :todo="item"
+                  :data-id="item.id"
+                />
+              </draggable>
+            </li>
           </ul>
         </div>
       </article>
@@ -90,7 +135,8 @@
 <script>
 import AddTodo from "../components/AddTodo";
 import TodoItem from "../components/TodoItem";
-import { mapState } from "vuex";
+import draggable from "vuedraggable";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "home",
@@ -105,14 +151,23 @@ export default {
   },
   components: {
     AddTodo,
-    TodoItem
+    TodoItem,
+    draggable
   },
   methods: {
+    ...mapActions(["updateTask"]),
     addNewTask(message) {
       this.formtType[message] = !this.formtType[message];
     },
     statusChange(message) {
       this.formtType[message] = false;
+    },
+    editStatus(evt) {
+      const edited = {
+        id: evt.item.dataset.id,
+        status: evt.to.dataset.status
+      };
+      this.updateTask(edited);
     }
   },
   computed: {
@@ -146,6 +201,8 @@ export default {
     background-color: #444;
     border-radius: 5px;
     box-shadow: 0 -2px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
   }
 
   &__header {
@@ -166,6 +223,7 @@ export default {
 
   &__content {
     padding: 30px 15px;
+    flex-grow: 1;
   }
 }
 
@@ -173,12 +231,26 @@ export default {
   padding: 0;
   margin: 0;
   list-style: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   &__item {
     border: 1px solid #666;
     border-radius: 7px;
     padding: 20px 15px;
     margin-bottom: 10px;
+  }
+
+  &__inner {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    height: 100%;
+  }
+
+  &__dragzone {
+    height: 100%;
   }
 
   &__empty {
@@ -225,5 +297,9 @@ export default {
 .fade-out-leave-to {
   opacity: 0;
   transform: translateY(40px);
+}
+
+.sortable-chosen {
+  background-color: #589df3;
 }
 </style>
