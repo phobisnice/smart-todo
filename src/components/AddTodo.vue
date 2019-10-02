@@ -107,11 +107,20 @@ export default {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+  margin: 0 10px;
+
+  &--edit {
+    background-color: #ff6347;
+  }
+
+  &--remove {
+    background-color: #b50000;
+  }
 
   &:hover,
   &:focus {
     box-shadow: 0 -2px 25px rgba(0, 0, 0, 0.1);
-    background-color: #3c8aeb;
+    opacity: 0.8;
   }
 }
 

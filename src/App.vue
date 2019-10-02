@@ -37,6 +37,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "vue-select/src/scss/vue-select.scss";
+
 html {
   font-size: 16px;
   line-height: 1.2;
